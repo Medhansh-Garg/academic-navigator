@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Link2,
   Code2,
@@ -10,8 +9,6 @@ import {
   List,
   Sparkles,
   ExternalLink,
-  Tag,
-  Clock,
 } from "lucide-react";
 import { PageWrapper } from "@/components/PageWrapper";
 import { GlassCard } from "@/components/GlassCard";
@@ -86,9 +83,9 @@ const mockItems: VaultItem[] = [
 ];
 
 const typeConfig = {
-  link: { icon: Link2, color: "text-info", bg: "bg-info/10" },
-  snippet: { icon: Code2, color: "text-accent", bg: "bg-accent/10" },
-  pdf: { icon: FileText, color: "text-warning", bg: "bg-warning/10" },
+  link: { icon: Link2, label: "Link" },
+  snippet: { icon: Code2, label: "Snippet" },
+  pdf: { icon: FileText, label: "PDF" },
 };
 
 const filterOptions: { label: string; value: ItemType | "all" }[] = [
@@ -112,16 +109,16 @@ export default function KnowledgeVault() {
   return (
     <PageWrapper title="Knowledge Vault" subtitle="Your curated library of links, code & documents">
       {/* Toolbar */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1.5">
           {filterOptions.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setFilter(opt.value)}
-              className={`rounded-xl px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
                 filter === opt.value
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "btn-glass"
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
               }`}
             >
               {opt.label}
@@ -130,103 +127,88 @@ export default function KnowledgeVault() {
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search vault..."
+              placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="glass-panel h-9 w-48 rounded-xl pl-9 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30"
+              className="h-8 w-44 rounded-lg border border-border bg-card pl-9 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-primary/40 transition-colors"
             />
           </div>
           <button
             onClick={() => setView(view === "grid" ? "list" : "grid")}
-            className="btn-glass p-2 rounded-xl"
+            className="btn-ghost p-1.5 rounded-lg"
           >
             {view === "grid" ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
           </button>
-          <button className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90 transition-opacity">
-            <Plus className="h-4 w-4" />
+          <button className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity">
+            <Plus className="h-3.5 w-3.5" />
             Add
           </button>
         </div>
       </div>
 
       {/* Items grid */}
-      <motion.div
-        layout
+      <div
         className={
           view === "grid"
-            ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            : "flex flex-col gap-3"
+            ? "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            : "flex flex-col gap-2"
         }
       >
-        <AnimatePresence mode="popLayout">
-          {filtered.map((item, i) => {
-            const cfg = typeConfig[item.type];
-            const Icon = cfg.icon;
-            return (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: i * 0.05, duration: 0.3 }}
-              >
-                <GlassCard hover>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`rounded-lg p-2 ${cfg.bg}`}>
-                      <Icon className={`h-4 w-4 ${cfg.color}`} />
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {item.type === "pdf" && (
-                        <button className="btn-glass flex items-center gap-1 px-2.5 py-1 text-xs text-primary">
-                          <Sparkles className="h-3 w-3" />
-                          Summarize
-                        </button>
-                      )}
-                      {item.url && (
-                        <button className="btn-glass p-1.5">
-                          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-sm text-foreground leading-snug mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-                    {item.description}
-                  </p>
-                  {item.preview && (
-                    <pre className="mb-3 rounded-lg bg-muted/50 p-3 text-[10px] text-muted-foreground font-mono line-clamp-3 overflow-hidden">
-                      {item.preview}
-                    </pre>
+        {filtered.map((item) => {
+          const cfg = typeConfig[item.type];
+          const Icon = cfg.icon;
+          return (
+            <GlassCard key={item.id} hover>
+              <div className="flex items-start justify-between mb-2.5">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                  <Icon className="h-3 w-3" />
+                  {cfg.label}
+                </span>
+                <div className="flex items-center gap-1">
+                  {item.type === "pdf" && (
+                    <button className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-primary hover:bg-secondary transition-colors">
+                      <Sparkles className="h-3 w-3" />
+                      Summarize
+                    </button>
                   )}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {item.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground"
-                        >
-                          <Tag className="h-2.5 w-2.5" />
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                      <Clock className="h-2.5 w-2.5" />
-                      {item.date}
+                  {item.url && (
+                    <button className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <h3 className="font-medium text-sm text-foreground leading-snug mb-1">
+                {item.title}
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                {item.description}
+              </p>
+              {item.preview && (
+                <pre className="mb-3 rounded-md bg-muted p-2.5 text-[11px] text-muted-foreground font-mono line-clamp-3 overflow-hidden">
+                  {item.preview}
+                </pre>
+              )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  {item.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                    >
+                      {tag}
                     </span>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
+                  ))}
+                </div>
+                <span className="text-[11px] text-muted-foreground">{item.date}</span>
+              </div>
+            </GlassCard>
+          );
+        })}
+      </div>
     </PageWrapper>
   );
 }
