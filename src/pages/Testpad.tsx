@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Play,
   Sparkles,
@@ -55,9 +54,9 @@ const defaultTestCases: TestCase[] = [
 ];
 
 const difficultyColor = {
-  Easy: "text-success bg-success/10",
-  Medium: "text-warning bg-warning/10",
-  Hard: "text-destructive bg-destructive/10",
+  Easy: "text-success",
+  Medium: "text-warning",
+  Hard: "text-destructive",
 };
 
 export default function Testpad() {
@@ -72,7 +71,6 @@ export default function Testpad() {
       prev.map((tc) => ({ ...tc, status: "running", actual: undefined }))
     );
 
-    // Simulate sequential test execution
     testCases.forEach((_, i) => {
       setTimeout(() => {
         setTestCases((prev) =>
@@ -94,33 +92,29 @@ export default function Testpad() {
   return (
     <PageWrapper title="Testpad" subtitle="Practice coding problems with AI-generated challenges">
       {/* Topic input */}
-      <GlassCard className="mb-6">
+      <GlassCard className="mb-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <input
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter a topic (e.g., 'Invert a binary tree')"
-            className="flex-1 rounded-xl bg-muted/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 transition-shadow"
+            className="flex-1 rounded-lg border border-border bg-muted px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:border-primary/40 transition-colors"
           />
-          <button className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90 transition-opacity whitespace-nowrap">
+          <button className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity whitespace-nowrap">
             <Sparkles className="h-4 w-4" />
-            Generate Problem
+            Generate
           </button>
         </div>
       </GlassCard>
 
       {/* Split pane */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {/* Left - Problem */}
         <GlassCard className="overflow-y-auto max-h-[calc(100vh-280px)] scrollbar-thin">
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-lg font-bold text-foreground">{defaultProblem.title}</h2>
-            <span
-              className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${
-                difficultyColor[defaultProblem.difficulty as keyof typeof difficultyColor]
-              }`}
-            >
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-base font-semibold text-foreground">{defaultProblem.title}</h2>
+            <span className={`text-xs font-medium ${difficultyColor[defaultProblem.difficulty as keyof typeof difficultyColor]}`}>
               {defaultProblem.difficulty}
             </span>
           </div>
@@ -130,25 +124,23 @@ export default function Testpad() {
           </p>
 
           <div className="mb-4">
-            <h3 className="text-xs font-semibold text-foreground mb-2">Constraints</h3>
+            <h3 className="text-xs font-medium text-foreground mb-2">Constraints</h3>
             <ul className="space-y-1">
               {defaultProblem.constraints.map((c, i) => (
-                <li key={i} className="text-xs text-muted-foreground font-mono">
-                  • {c}
-                </li>
+                <li key={i} className="text-xs text-muted-foreground font-mono">• {c}</li>
               ))}
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-foreground">Examples</h3>
+          <div className="space-y-2.5">
+            <h3 className="text-xs font-medium text-foreground">Examples</h3>
             {defaultProblem.examples.map((ex, i) => (
-              <div key={i} className="rounded-lg bg-muted/50 p-3">
+              <div key={i} className="rounded-md bg-muted p-2.5">
                 <p className="text-xs font-mono text-muted-foreground">
-                  <span className="font-semibold text-foreground">Input:</span> {ex.input}
+                  <span className="text-foreground">Input:</span> {ex.input}
                 </p>
-                <p className="text-xs font-mono text-muted-foreground mt-1">
-                  <span className="font-semibold text-foreground">Output:</span> {ex.output}
+                <p className="text-xs font-mono text-muted-foreground mt-0.5">
+                  <span className="text-foreground">Output:</span> {ex.output}
                 </p>
               </div>
             ))}
@@ -156,19 +148,19 @@ export default function Testpad() {
         </GlassCard>
 
         {/* Right - Editor */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <GlassCard className="flex-1 p-0 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border/30">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+              <div className="flex items-center gap-1.5">
                 <span className="text-xs font-medium text-muted-foreground">Python</span>
                 <ChevronDown className="h-3 w-3 text-muted-foreground" />
               </div>
               <button
                 onClick={runTests}
                 disabled={running}
-                className="flex items-center gap-2 rounded-lg bg-success px-4 py-1.5 text-xs font-medium text-success-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-md bg-success/90 px-3 py-1 text-xs font-medium text-success-foreground hover:bg-success transition-colors disabled:opacity-50"
               >
-                <Play className="h-3.5 w-3.5" />
+                <Play className="h-3 w-3" />
                 {running ? "Running..." : "Run"}
               </button>
             </div>
@@ -193,30 +185,29 @@ export default function Testpad() {
 
           {/* Test results */}
           <GlassCard>
-            <h3 className="text-xs font-semibold text-foreground mb-3">Test Cases</h3>
-            <div className="space-y-2">
+            <h3 className="text-xs font-medium text-foreground mb-2.5">Test Cases</h3>
+            <div className="space-y-1.5">
               {testCases.map((tc) => (
-                <motion.div
+                <div
                   key={tc.id}
-                  layout
-                  className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2"
+                  className="flex items-center justify-between rounded-md bg-muted px-3 py-2"
                 >
                   <div className="flex items-center gap-2">
                     {tc.status === "pass" ? (
-                      <CheckCircle2 className="h-4 w-4 text-success" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-success" />
                     ) : tc.status === "fail" ? (
-                      <XCircle className="h-4 w-4 text-destructive" />
+                      <XCircle className="h-3.5 w-3.5 text-destructive" />
                     ) : tc.status === "running" ? (
-                      <Clock className="h-4 w-4 text-warning animate-pulse" />
+                      <Clock className="h-3.5 w-3.5 text-warning animate-pulse" />
                     ) : (
-                      <Circle className="h-4 w-4 text-muted-foreground" />
+                      <Circle className="h-3.5 w-3.5 text-muted-foreground" />
                     )}
                     <span className="text-xs font-mono text-muted-foreground">
-                      Test {tc.id}: {tc.input}
+                      Case {tc.id}: {tc.input}
                     </span>
                   </div>
                   <span className="text-xs font-mono text-muted-foreground">→ {tc.expected}</span>
-                </motion.div>
+                </div>
               ))}
             </div>
           </GlassCard>
