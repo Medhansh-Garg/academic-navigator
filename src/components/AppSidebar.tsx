@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { title: "Knowledge Vault", path: "/", icon: BookOpen },
+  { title: "Knowledge Vault", path: "/vault", icon: BookOpen },
   { title: "AI Roadmap", path: "/roadmap", icon: Map },
   { title: "Testpad", path: "/testpad", icon: Code2 },
   { title: "Community", path: "/community", icon: Users },
