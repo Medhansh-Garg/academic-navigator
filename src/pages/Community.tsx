@@ -3,9 +3,11 @@ import {
   ArrowBigUp,
   MessageSquare,
   Plus,
+  X,
 } from "lucide-react";
 import { PageWrapper } from "@/components/PageWrapper";
 import { GlassCard } from "@/components/GlassCard";
+import { toast } from "@/hooks/use-toast";
 
 interface Issue {
   id: string;
@@ -79,9 +81,13 @@ const statusLabels = {
   "in-review": "In Review",
 };
 
+const categories = ["Infrastructure", "Academics", "Facilities", "Hostel", "Other"];
+
 export default function Community() {
   const [issues, setIssues] = useState(mockIssues);
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [showModal, setShowModal] = useState(false);
+  const [newIssue, setNewIssue] = useState({ title: "", description: "", category: "Academics" });
 
   const handleUpvote = (id: string) => {
     setIssues((prev) =>
@@ -95,6 +101,29 @@ export default function Community() {
           : issue
       )
     );
+  };
+
+  const handleSubmitIssue = () => {
+    if (!newIssue.title.trim()) {
+      toast({ title: "Title is required", variant: "destructive" });
+      return;
+    }
+    const issue: Issue = {
+      id: Date.now().toString(),
+      title: newIssue.title,
+      description: newIssue.description,
+      author: "You",
+      upvotes: 1,
+      comments: 0,
+      status: "pending",
+      category: newIssue.category,
+      time: "Just now",
+      voted: true,
+    };
+    setIssues((prev) => [issue, ...prev]);
+    setNewIssue({ title: "", description: "", category: "Academics" });
+    setShowModal(false);
+    toast({ title: "Issue raised successfully!" });
   };
 
   const filtered = issues
@@ -120,7 +149,10 @@ export default function Community() {
             </button>
           ))}
         </div>
-        <button className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity">
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+        >
           <Plus className="h-3.5 w-3.5" />
           Raise Issue
         </button>
@@ -177,6 +209,64 @@ export default function Community() {
           </GlassCard>
         ))}
       </div>
+
+      {/* Raise Issue Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" onClick={() => setShowModal(false)}>
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-sm font-semibold text-foreground">Raise an Issue</h2>
+              <button onClick={() => setShowModal(false)} className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Issue title"
+                value={newIssue.title}
+                onChange={(e) => setNewIssue((p) => ({ ...p, title: e.target.value }))}
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:border-primary/40 transition-colors"
+              />
+              <textarea
+                placeholder="Describe the issue in detail..."
+                value={newIssue.description}
+                onChange={(e) => setNewIssue((p) => ({ ...p, description: e.target.value }))}
+                rows={4}
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:border-primary/40 transition-colors resize-none"
+              />
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setNewIssue((p) => ({ ...p, category: cat }))}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                        newIssue.category === cat
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-5">
+              <button onClick={() => setShowModal(false)} className="rounded-lg px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                Cancel
+              </button>
+              <button onClick={handleSubmitIssue} className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity">
+                Submit Issue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageWrapper>
   );
 }
